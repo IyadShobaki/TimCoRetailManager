@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TRMDesktopUI", "TRMDesktopU
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TRMDataManager.Library", "TRMDataManager.Library\TRMDataManager.Library.csproj", "{AB71CD6E-8349-42E7-8F24-4401EBEE61E0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TRMDesktopUI.Library", "TRMDesktopUI.Library\TRMDesktopUI.Library.csproj", "{034D3B2E-EE51-4772-8DCE-B44B4F274AD0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{AB71CD6E-8349-42E7-8F24-4401EBEE61E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB71CD6E-8349-42E7-8F24-4401EBEE61E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB71CD6E-8349-42E7-8F24-4401EBEE61E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{034D3B2E-EE51-4772-8DCE-B44B4F274AD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{034D3B2E-EE51-4772-8DCE-B44B4F274AD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{034D3B2E-EE51-4772-8DCE-B44B4F274AD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{034D3B2E-EE51-4772-8DCE-B44B4F274AD0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

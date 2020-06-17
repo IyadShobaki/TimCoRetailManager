@@ -14,7 +14,8 @@ namespace TRMDataManager.Controllers
 
     public class UserController : ApiController
     {    
-        public List<UserModel> GetById()
+        [HttpGet]
+        public UserModel GetById()
         {
             //will get the id of the user who logged in
             string userId = RequestContext.Principal.Identity.GetUserId();
@@ -22,7 +23,7 @@ namespace TRMDataManager.Controllers
             //to get UserData - > add reference to TRMDataanager.Library
             UserData data = new UserData();
 
-            return data.GetUsersById(userId); 
+            return data.GetUsersById(userId).First(); 
         }
     }
 }
