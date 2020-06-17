@@ -33,8 +33,40 @@ namespace TRMDesktopUI.ViewModels
             set { 
                 _password = value;
                 NotifyOfPropertyChange(() => Password);
-               NotifyOfPropertyChange(() => CanLogIn);
+                NotifyOfPropertyChange(() => CanLogIn);
             }
+        }
+
+        //to show the error message if the user didn't enter the correct username or pass
+        public bool IsErrorVisible
+        {
+            get 
+            {
+                bool output = false;
+
+                if (ErrorMessage?.Length > 0)
+                {
+                    output = true;
+                }
+                return output; 
+            }
+          
+
+        }
+
+        private string _errorMessage;
+
+        public string ErrorMessage
+        {
+            get { return _errorMessage; }
+            set 
+            {
+                _errorMessage = value;
+                NotifyOfPropertyChange(() => IsErrorVisible);
+                NotifyOfPropertyChange(() => ErrorMessage);
+               
+            }
+         
         }
 
 
@@ -53,16 +85,17 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
-        public async Task LogIn()
+        public async Task LogIn()  //async to not lock your application up
         {
             try
             {
+                ErrorMessage = "";
                 //the result will be AthunticatedUser model
                 var result = await _apiHelper.Authenticate(UserName, Password);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                ErrorMessage = ex.Message;
             }
         }
 
