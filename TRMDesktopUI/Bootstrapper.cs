@@ -32,20 +32,23 @@ namespace TRMDesktopUI
         {
             _container.Instance(_container);
 
+            //iyad
             //WindowManager handling the idea of bringing windows in and out 
             //EventAggregator, this where we can pass event messaging throughout our application,
-            //one peice can raise the event and other one can listen for it and do something
-
+            //one peice can raise the event and other one can listen for it and do something.
             //both of the previous are singletons. singleton means that we create one instance of the class
             //for the life of the application (the scope of this container)
             //Don't use singletons unless you can't find a better way, because they are not great
             //on memory usage and not great on the overall using Object Oriented the way it's supposed to be used.
             _container
-                .Singleton<IWindowManager, WindowManager>()
-                .Singleton<IEventAggregator, EventAggregator>();
+                .Singleton<IWindowManager, WindowManager>() //to get the same instance one time in the lifespan of app
+                .Singleton<IEventAggregator, EventAggregator>()//to get the same instance one time in the lifespan of app
+                .Singleton<IAPIHelper, APIHelper>();//to get the same instance one time in the lifespan of app
+               //we add APIHelper becasue we need just one HttpClient
+               //to open the entire lifespan of the app
 
             //using reflection GetType()
-  
+
             GetType().Assembly.GetTypes()  //GetTypes() means get every type in our entire application
                 .Where(type => type.IsClass) //where the type is a class
                 .Where(type => type.Name.EndsWith("ViewModel"))//where the name of the class end with ViewModel like(ShellViewModel)

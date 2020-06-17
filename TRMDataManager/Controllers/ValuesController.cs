@@ -14,6 +14,7 @@ namespace TRMDataManager.Controllers
         // GET api/values
         public IEnumerable<string> Get()
         {
+            //Tim added the userId to get the token 
             string userId = RequestContext.Principal.Identity.GetUserId();
 
             return new string[] { "value1", "value2", userId };

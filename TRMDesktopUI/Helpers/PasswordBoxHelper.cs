@@ -9,6 +9,8 @@ using System.Windows.Controls;
 
 namespace TRMDesktopUI.Helpers
 {
+ 
+    //the following code from stackoverflow /setting for the password
     public static class PasswordBoxHelper
     {
         public static readonly DependencyProperty BoundPasswordProperty =
@@ -20,6 +22,7 @@ namespace TRMDesktopUI.Helpers
         public static string GetBoundPassword(DependencyObject d)
         {
             var box = d as PasswordBox;
+
             if (box != null)
             {
                 //this funny little dance here ensures that we've hooked the 

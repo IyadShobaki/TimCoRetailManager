@@ -7,6 +7,7 @@ using System.Web.Http.Description;
 
 namespace TRMDataManager.App_Start
 {
+    //we add this class -- iyad
     public class AuthorizationOperationFilter : IOperationFilter
     {
         public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
