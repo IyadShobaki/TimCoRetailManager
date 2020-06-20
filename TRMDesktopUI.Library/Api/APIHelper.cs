@@ -16,13 +16,24 @@ namespace TRMDesktopUI.Library.Api
     //we created the interface so we can use APIHelper in dependency injection system
     //uncheck ApiClient when you create the interface
     {
-        private HttpClient apiClient;
+        private HttpClient _apiClient;
         private ILoggedInUserModel _loggedInUser;
 
         public APIHelper(ILoggedInUserModel loggedInUser)
         {
             InitializeClient();
             _loggedInUser = loggedInUser;
+        }
+
+        //A read only class, so we can use _apiClient in differnet classes like product
+        public HttpClient ApiClient
+        {
+            
+            get
+            {
+                return _apiClient;
+            }
+
         }
         //every time you call APIHelper will initilaize that client
         //because we will have one HttpClient for the lifespan of the app
@@ -37,10 +48,10 @@ namespace TRMDesktopUI.Library.Api
             //like central development server, central testing server, or central QA server or central production
             //server. All of them can use differnet URL without recompiling the application
             string api = ConfigurationManager.AppSettings["api"];
-            apiClient = new HttpClient();
-            apiClient.BaseAddress = new Uri(api); //the base address of the URL we get it from App.config
-            apiClient.DefaultRequestHeaders.Accept.Clear();
-            apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _apiClient = new HttpClient();
+            _apiClient.BaseAddress = new Uri(api); //the base address of the URL we get it from App.config
+            _apiClient.DefaultRequestHeaders.Accept.Clear();
+            _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         //Authenticate a method to call out to the API, sending the username and password to get our token info
@@ -53,7 +64,7 @@ namespace TRMDesktopUI.Library.Api
                 new KeyValuePair<string, string>("password", password)
             }); //this data will be send to API endpoint
 
-            using (HttpResponseMessage response = await apiClient.PostAsync("/Token", data))
+            using (HttpResponseMessage response = await _apiClient.PostAsync("/Token", data))
             { //the URL will change, now its in alocalhost address, but eventually 
                 //will be address in Azure or local web server or something else
                 if (response.IsSuccessStatusCode)
@@ -74,12 +85,12 @@ namespace TRMDesktopUI.Library.Api
 
         public async Task GetLoggedInUserInfo(string token)
         {
-            apiClient.DefaultRequestHeaders.Clear();
-            apiClient.DefaultRequestHeaders.Accept.Clear();
-            apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            apiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer { token }");
+            _apiClient.DefaultRequestHeaders.Clear();
+            _apiClient.DefaultRequestHeaders.Accept.Clear();
+            _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _apiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer { token }");
 
-            using (HttpResponseMessage response = await apiClient.GetAsync("/api/User"))
+            using (HttpResponseMessage response = await _apiClient.GetAsync("/api/User"))
             {
                 if (response.IsSuccessStatusCode)
                 {

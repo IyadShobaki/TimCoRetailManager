@@ -32,7 +32,8 @@ namespace TRMDesktopUI
         //when people ask for SimpleContainer
         protected override void Configure()
         {
-            _container.Instance(_container);
+            _container.Instance(_container)
+                .PerRequest<IProductEndPoint, ProductEndPoint>();
 
             //iyad
             //WindowManager handling the idea of bringing windows in and out 
