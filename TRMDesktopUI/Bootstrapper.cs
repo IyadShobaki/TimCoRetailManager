@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using TRMDesktopUI.Helpers;
 using TRMDesktopUI.Library.Api;
+using TRMDesktopUI.Library.Helpers;
 using TRMDesktopUI.Library.Models;
 using TRMDesktopUI.ViewModels;
 
@@ -47,6 +48,7 @@ namespace TRMDesktopUI
                 .Singleton<IWindowManager, WindowManager>() //to get the same instance one time in the lifespan of app
                 .Singleton<IEventAggregator, EventAggregator>()//to get the same instance one time in the lifespan of app
                 .Singleton<ILoggedInUserModel, LoggedInUserModel>()
+                .Singleton<IConfigHelper, ConfigHelper>()
                 .Singleton<IAPIHelper, APIHelper>();//to get the same instance one time in the lifespan of app
                //we add APIHelper becasue we need just one HttpClient
                //to open the entire lifespan of the app
