@@ -1,4 +1,5 @@
-﻿using Caliburn.Micro;
+﻿using AutoMapper;
+using Caliburn.Micro;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ using TRMDesktopUI.Helpers;
 using TRMDesktopUI.Library.Api;
 using TRMDesktopUI.Library.Helpers;
 using TRMDesktopUI.Library.Models;
+using TRMDesktopUI.Models;
 using TRMDesktopUI.ViewModels;
 
 namespace TRMDesktopUI
@@ -29,10 +31,26 @@ namespace TRMDesktopUI
                 PasswordBoxHelper.BoundPasswordProperty, "Password", "PasswordChanged");
         }
 
+        private IMapper ConfigureAutoMapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<ProductModel, ProductDisplayModel>();
+                cfg.CreateMap<CartItemModel, CartItemDisplayModel>();
+            });
+
+            var output = config.CreateMapper();
+
+            return output;
+        }
+
         //the most important one. the container holds an instance of itself to pass
         //when people ask for SimpleContainer
         protected override void Configure()
         {
+
+            _container.Instance(ConfigureAutoMapper());
+
             _container.Instance(_container)
                 .PerRequest<IProductEndPoint, ProductEndPoint>()
                 .PerRequest<ISaleEndPoint, SaleEndPoint>();
