@@ -5,8 +5,6 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 //TMRDataManager.Libraray is a Class Library (.Net Framework), we will upgrade it to (.Net Core) later
 //Remove class1.cs after creation
@@ -15,7 +13,7 @@ namespace TRMDataManager.Library.Internal.DataAccess
     //This class library is just for the API not the (API and the WPF) 
     //because they are not the same type of project
     //This library will do data access. WPF should not know nothing about database nor have access to it
-    internal class SqlDataAccess  //internal means that this class will not be used out side the library
+    internal class SqlDataAccess : IDisposable  //internal means that this class will not be used out side the library
     {
         public string GetConnectionString(string name)
         {
@@ -28,7 +26,7 @@ namespace TRMDataManager.Library.Internal.DataAccess
         //then Manage NuGet Packages. Browse and search for Dapper and install it.
         //dapper is kind of micro ORM (Object relational mapper). Allow us to talk to the database and get information
         //and map that data into objects
-        
+
         //Read method to load data from the database 
         public List<T> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName)
         {
@@ -51,10 +49,63 @@ namespace TRMDataManager.Library.Internal.DataAccess
 
             using (IDbConnection connection = new SqlConnection(connectionString))
             {
-               
-               connection.Execute(storedProcedure, parameters,
-                    commandType: CommandType.StoredProcedure);
+
+                connection.Execute(storedProcedure, parameters,
+                     commandType: CommandType.StoredProcedure);
             }
         }
+
+        private IDbConnection _connection;
+        private IDbTransaction _transaction;
+
+        // Open connection/start transaction method
+        public void StartTransaction(string connectionStringName)
+        {
+            string connectionString = GetConnectionString(connectionStringName);
+            _connection = new SqlConnection(connectionString);
+            _connection.Open();
+
+            _transaction = _connection.BeginTransaction();
+        }
+
+        // load using the transaction
+        public List<T> LoadDataInTransaction<T, U>(string storedProcedure, U parameters)
+        {
+            List<T> rows = _connection.Query<T>(storedProcedure, parameters,
+                commandType: CommandType.StoredProcedure, transaction: _transaction).ToList();
+
+            return rows;
+        }
+        // save using the transaction
+        public void SaveDataInTransaction<T>(string storedProcedure, T parameters)
+        {
+
+            _connection.Execute(storedProcedure, parameters,
+                        commandType: CommandType.StoredProcedure, transaction: _transaction);
+        }
+
+
+        // close connection/stop transaction method
+        public void CommitTransaction()
+        {
+            _transaction?.Commit();
+            _connection?.Close();
+        }
+        // close connection/stop transaction method
+        public void RollbackTransaction()
+        {
+            _transaction?.Rollback();
+            _connection?.Close();
+        }
+
+        // dispose
+        public void Dispose()
+        {
+            CommitTransaction();
+        }
+
+
+
+
     }
 }
