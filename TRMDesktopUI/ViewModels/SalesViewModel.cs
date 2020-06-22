@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Caliburn.Micro;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Documents;
+using System.Windows;
 using TRMDesktopUI.Library.Api;
 using TRMDesktopUI.Library.Helpers;
 using TRMDesktopUI.Library.Models;
@@ -14,28 +16,60 @@ namespace TRMDesktopUI.ViewModels
 {
     public class SalesViewModel : Screen
     {
-        IProductEndPoint _productEndPoint;
-        ISaleEndPoint _saleEndPoint;
-        IConfigHelper _configHelper;
-        IMapper _mapper;
+        private IProductEndPoint _productEndPoint;
+        private ISaleEndPoint _saleEndPoint;
+        private IConfigHelper _configHelper;
+        private IMapper _mapper;
+        private readonly StatusInfoViewModel _status;
+        private readonly IWindowManager _window;
+
         public SalesViewModel(IProductEndPoint productEndPoint,
-            IConfigHelper configHelper, ISaleEndPoint saleEndPoint, IMapper mapper)
+            IConfigHelper configHelper,
+            ISaleEndPoint saleEndPoint,
+            IMapper mapper,
+            StatusInfoViewModel status,
+            IWindowManager window)
         {
             _productEndPoint = productEndPoint;
             _saleEndPoint = saleEndPoint;
             _configHelper = configHelper;
             _mapper = mapper;
+            _status = status;
+            _window = window;
         }
 
         protected override async void OnViewLoaded(object view)
         {
             base.OnViewLoaded(view);
-            await LoadProducts();
+            try
+            {
+                await LoadProducts();
+            }
+            catch (Exception ex)
+            {
+                dynamic settings = new ExpandoObject();
+                settings.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                settings.ResizeMode = ResizeMode.NoResize;
+                settings.Title = "System Error";
+
+                if (ex.Message == "Unauthorized")
+                {
+                    _status.UpdateMessage("Unauthorized Access",
+                   "You do not have permission to interact with the Sales Form.");
+                    _window.ShowDialog(_status, null, settings);
+                }
+                else
+                {
+                    _status.UpdateMessage("Fatal Exception", ex.Message);
+                    _window.ShowDialog(_status, null, settings);
+                }
+                TryClose();
+            }
         }
         private async Task LoadProducts()
         {
-            var productList = await _productEndPoint.GetAll();
-            var products = _mapper.Map<List<ProductDisplayModel>>(productList);
+            List<ProductModel> productList = await _productEndPoint.GetAll();
+            List<ProductDisplayModel> products = _mapper.Map<List<ProductDisplayModel>>(productList);
             Products = new BindingList<ProductDisplayModel>(products);
         }
         private BindingList<ProductDisplayModel> _products;
@@ -43,7 +77,8 @@ namespace TRMDesktopUI.ViewModels
         public BindingList<ProductDisplayModel> Products
         {
             get { return _products; }
-            set {
+            set
+            {
                 _products = value;
                 NotifyOfPropertyChange(() => Products);
             }
@@ -54,7 +89,8 @@ namespace TRMDesktopUI.ViewModels
         public ProductDisplayModel SelectedProduct
         {
             get { return _selectedProduct; }
-            set {
+            set
+            {
                 _selectedProduct = value;
                 NotifyOfPropertyChange(() => SelectedProduct);
                 NotifyOfPropertyChange(() => CanAddToCart);
@@ -107,19 +143,20 @@ namespace TRMDesktopUI.ViewModels
         public int ItemQuantity
         {
             get { return _itemQuantity; }
-            set { 
+            set
+            {
                 _itemQuantity = value;
                 NotifyOfPropertyChange(() => ItemQuantity);
                 NotifyOfPropertyChange(() => CanAddToCart);
             }
         }
 
- 
+
         public string SubTotal
         {
-            get 
+            get
             {
-        
+
                 return CalculateSubTotal().ToString("C");
             }
         }
@@ -128,7 +165,7 @@ namespace TRMDesktopUI.ViewModels
         {
             decimal subTotal = 0;
 
-            foreach (var item in Cart)
+            foreach (CartItemDisplayModel item in Cart)
             {
                 subTotal += (item.Product.RetailPrice * item.QuantityInCart);
             }
@@ -138,7 +175,7 @@ namespace TRMDesktopUI.ViewModels
         private decimal CalculateTax()
         {
             decimal taxAmount = 0;
-            decimal taxRate = _configHelper.GetTaxRate()/100;
+            decimal taxRate = _configHelper.GetTaxRate() / 100;
 
             taxAmount = Cart
                 .Where(x => x.Product.IsTaxable)
@@ -192,7 +229,7 @@ namespace TRMDesktopUI.ViewModels
 
             if (existingItem != null)
             {
-                existingItem.QuantityInCart += ItemQuantity;     
+                existingItem.QuantityInCart += ItemQuantity;
             }
             else
             {
@@ -204,7 +241,7 @@ namespace TRMDesktopUI.ViewModels
                 Cart.Add(item);
             }
 
-           
+
             SelectedProduct.QuantityInStock -= ItemQuantity;
             ItemQuantity = 1;
             NotifyOfPropertyChange(() => SubTotal);
@@ -265,14 +302,14 @@ namespace TRMDesktopUI.ViewModels
         {
             // Create a SaleModel and post it to the API
             SaleModel sale = new SaleModel();
-            foreach (var item in Cart)
+            foreach (CartItemDisplayModel item in Cart)
             {
                 sale.SaleDetails.Add(new SaleDetailModel
                 {
                     ProductId = item.Product.Id,
                     Quantity = item.QuantityInCart
 
-                });   
+                });
             }
 
             await _saleEndPoint.PostSale(sale);
