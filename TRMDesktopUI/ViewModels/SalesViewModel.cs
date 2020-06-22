@@ -68,10 +68,11 @@ namespace TRMDesktopUI.ViewModels
         }
         private async Task LoadProducts()
         {
-            List<ProductModel> productList = await _productEndPoint.GetAll();
-            List<ProductDisplayModel> products = _mapper.Map<List<ProductDisplayModel>>(productList);
+            var productList = await _productEndPoint.GetAll();
+            var products = _mapper.Map<List<ProductDisplayModel>>(productList);
             Products = new BindingList<ProductDisplayModel>(products);
         }
+
         private BindingList<ProductDisplayModel> _products;
 
         public BindingList<ProductDisplayModel> Products

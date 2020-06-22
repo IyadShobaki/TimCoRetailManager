@@ -53,6 +53,7 @@ namespace TRMDesktopUI
 
             _container.Instance(_container)
                 .PerRequest<IProductEndPoint, ProductEndPoint>()
+                .PerRequest<IUserEndpoint, UserEndpoint>()
                 .PerRequest<ISaleEndPoint, SaleEndPoint>();
 
             //iyad
