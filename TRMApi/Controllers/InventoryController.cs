@@ -23,6 +23,7 @@ namespace TRMApi.Controllers
             _config = config;
         }
         [Authorize(Roles = "Manager,Admin")] //Manager (or) Admin can get the inventory info
+        [HttpGet]
         public List<InventoryModel> Get()
         {
             InventoryData data = new InventoryData(_config);
@@ -31,6 +32,7 @@ namespace TRMApi.Controllers
         //if you have Warehouse Worker and you want to make it join mission
         //[Authorize(Roles = "WarehouseWorker")] //Admin (and) WarehouseWorker can add to the inventory
         [Authorize(Roles = "Admin")]
+        [HttpPost]
         public void Post(InventoryModel item)
         {
             InventoryData data = new InventoryData(_config);
