@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -15,11 +16,17 @@ namespace TRMDataManager.Library.Internal.DataAccess
     //This library will do data access. WPF should not know nothing about database nor have access to it
     internal class SqlDataAccess : IDisposable  //internal means that this class will not be used out side the library
     {
+        public SqlDataAccess(IConfiguration config)
+        {
+            _config = config;
+        }
         public string GetConnectionString(string name)
         {
+            return _config.GetConnectionString(name);
+
             //to add ConfigurationManager -> click Ctrl + . and click (Add reference to 'System.Configuration.dll'
             //the connection string is in TRMDataManager - Web.config
-            return ConfigurationManager.ConnectionStrings[name].ConnectionString;
+            //return ConfigurationManager.ConnectionStrings[name].ConnectionString; //old
         }
         //we need couple of methods for getting and setting data
         //so we need to install dapper. Right click on the references on TMRDataManager.Libraray
@@ -87,6 +94,7 @@ namespace TRMDataManager.Library.Internal.DataAccess
         }
 
         private bool isClosed = false;
+        private readonly IConfiguration _config;
 
         // close connection/stop transaction method
         public void CommitTransaction()

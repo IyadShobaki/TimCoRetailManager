@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TRMDataManager.Library.DataAccess;
 using TRMDataManager.Library.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace TRMApi.Controllers
 {
@@ -15,10 +16,16 @@ namespace TRMApi.Controllers
     [Authorize]
     public class InventoryController : ControllerBase
     {
+        private readonly IConfiguration _config;
+
+        public InventoryController(IConfiguration config)
+        {
+            _config = config;
+        }
         [Authorize(Roles = "Manager,Admin")] //Manager (or) Admin can get the inventory info
         public List<InventoryModel> Get()
         {
-            InventoryData data = new InventoryData();
+            InventoryData data = new InventoryData(_config);
             return data.GetInventory();
         }
         //if you have Warehouse Worker and you want to make it join mission
@@ -26,7 +33,7 @@ namespace TRMApi.Controllers
         [Authorize(Roles = "Admin")]
         public void Post(InventoryModel item)
         {
-            InventoryData data = new InventoryData();
+            InventoryData data = new InventoryData(_config);
             data.SaveInventoryRecord(item);
         }
     }
