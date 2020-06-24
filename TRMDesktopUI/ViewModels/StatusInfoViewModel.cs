@@ -23,7 +23,7 @@ namespace TRMDesktopUI.ViewModels
 
         public void Close()
         {
-            TryClose(); //will close the curretn form. this.close() will close the whole app
+            TryCloseAsync(); //will close the curretn form. this.close() will close the whole app
         }
     }
 }
