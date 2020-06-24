@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -16,9 +17,10 @@ namespace TRMDataManager.Library.Internal.DataAccess
     //This library will do data access. WPF should not know nothing about database nor have access to it
     public class SqlDataAccess : IDisposable, ISqlDataAccess
     {
-        public SqlDataAccess(IConfiguration config)
+        public SqlDataAccess(IConfiguration config, ILogger<SqlDataAccess> logger)
         {
             _config = config;
+            _logger = logger;
         }
         public string GetConnectionString(string name)
         {
@@ -95,6 +97,7 @@ namespace TRMDataManager.Library.Internal.DataAccess
 
         private bool isClosed = false;
         private readonly IConfiguration _config;
+        private readonly ILogger<SqlDataAccess> _logger;
 
         // close connection/stop transaction method
         public void CommitTransaction()
@@ -122,9 +125,9 @@ namespace TRMDataManager.Library.Internal.DataAccess
                 {
                     CommitTransaction();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // TODO - Log this issue
+                    _logger.LogError(ex, "Commit transaction failed in the dispose method.");
                 }
             }
 
