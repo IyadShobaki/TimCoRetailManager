@@ -21,15 +21,15 @@ namespace TRMApi.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly IConfiguration _config;
+        private readonly IUserData _userData;
 
         public UserController(ApplicationDbContext context,
             UserManager<IdentityUser> userManager,
-            IConfiguration config)
+            IUserData userData)
         {
             _context = context;
             _userManager = userManager;
-            _config = config;
+            _userData = userData;
         }
         [HttpGet]
         public UserModel GetById()
@@ -37,10 +37,7 @@ namespace TRMApi.Controllers
             //will get the id of the user who logged in
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); //old way - RequestContext.Principal.Identity.GetUserId();
 
-            //to get UserData - > add reference to TRMDataanager.Library
-            UserData data = new UserData(_config);
-
-            return data.GetUsersById(userId).First();
+            return _userData.GetUsersById(userId).First();
         }
         [Authorize(Roles = "Admin")]
         [HttpGet]

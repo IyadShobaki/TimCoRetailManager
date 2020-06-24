@@ -14,7 +14,7 @@ namespace TRMDataManager.Library.Internal.DataAccess
     //This class library is just for the API not the (API and the WPF) 
     //because they are not the same type of project
     //This library will do data access. WPF should not know nothing about database nor have access to it
-    internal class SqlDataAccess : IDisposable  //internal means that this class will not be used out side the library
+    public class SqlDataAccess : IDisposable, ISqlDataAccess
     {
         public SqlDataAccess(IConfiguration config)
         {
