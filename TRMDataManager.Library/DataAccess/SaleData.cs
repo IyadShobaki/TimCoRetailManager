@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using TRMDataManager.Library.Internal.DataAccess;
 using TRMDataManager.Library.Models;
@@ -11,12 +12,29 @@ namespace TRMDataManager.Library.DataAccess
     {
         private readonly IProductData _productData;
         private readonly ISqlDataAccess _sql;
+        private readonly IConfiguration _config;
 
         public SaleData(IProductData productData,
-            ISqlDataAccess sql)
+            ISqlDataAccess sql, IConfiguration config)
         {
             _productData = productData;
             _sql = sql;
+            _config = config;
+        }
+
+        public decimal GetTaxRate()
+        {
+            string rateText = _config.GetValue<string>("TaxRate"); //ConfigurationManager.AppSettings["taxRate"];
+
+            bool IsValidTaxRate = Decimal.TryParse(rateText, out decimal output);
+            if (!IsValidTaxRate)
+            {
+                throw new ConfigurationErrorsException("The tax rate is not set up properly");
+            }
+
+            output = output / 100;
+
+            return output;
         }
         public void SaveSale(SaleModel saleInfo, string cashierId)
         {
@@ -25,7 +43,7 @@ namespace TRMDataManager.Library.DataAccess
             // Start filling in the sale detail models we will save to the database
             // Fill in the available information
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
-            decimal taxRate = ConfigHelper.GetTaxRate() / 100;
+            decimal taxRate = GetTaxRate();
 
             foreach (SaleDetailModel item in saleInfo.SaleDetails)
             {
