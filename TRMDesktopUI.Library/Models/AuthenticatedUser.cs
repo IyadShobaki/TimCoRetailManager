@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TRMDesktopUI.Models
+namespace TRMDesktopUI.Library.Models
 {
     //the following class will enable us to get token from the api
     public class AuthenticatedUser
